@@ -12,7 +12,7 @@ class OurDataset(torch.utils.data.Dataset):
         return len(self.encodings.input_ids)
 
 
-def train_bert(data_filename):
+def train_bert(data_filename, epochs=2):
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
     model = BertForPreTraining.from_pretrained('bert-base-uncased')
 
@@ -77,8 +77,6 @@ def train_bert(data_filename):
     optim = AdamW(model.parameters(), lr=5e-5)
 
     from tqdm import tqdm  # for our progress bar
-
-    epochs = 2
 
     for epoch in range(epochs):
         # setup loop with TQDM and dataloader
