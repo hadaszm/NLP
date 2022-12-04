@@ -21,7 +21,10 @@ def return_embeddings(my_sentence, model, device):
         final_layer = output.last_hidden_state
     except AttributeError: 
         final_layer = output[0]
-    return final_layer[0][1:-1].detach().numpy().mean(0).reshape(1, -1)
+    if device == 'cpu': 
+        return final_layer[0][1:-1].detach().numpy().mean(0).reshape(1, -1)
+    else: 
+        return final_layer[0][1:-1].detach().cpu().numpy().mean(0).reshape(1, -1)
     
 def process_extracted_keywords_file(filename): 
     df = pd.read_csv(filename)\
