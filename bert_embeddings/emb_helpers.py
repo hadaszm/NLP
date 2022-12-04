@@ -3,14 +3,23 @@ import numpy as np
 from transformers import BertTokenizer, BertForPreTraining, BertModel
 import torch
 import tqdm
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+from transformers import AutoTokenizer, AutoModel
+
+tokenizer = AutoTokenizer.from_pretrained("dmis-lab/biobert-v1.1")
 
 
 def return_embeddings(my_sentence, model): 
     input_ids = tokenizer(my_sentence, return_tensors="pt")
+    try:
+        model = model.bert
+    except AttributeError:
+        pass
     output = model(**input_ids)
 
-    final_layer = output.last_hidden_state
+    try: 
+        final_layer = output.last_hidden_state
+    except AttributeError: 
+        final_layer = output[0]
     return final_layer[0][1:-1].detach().numpy().mean(0).reshape(1, -1)
     
 def process_extracted_keywords_file(filename): 
@@ -22,7 +31,7 @@ def process_extracted_keywords_file(filename):
    
     df = df.drop('topic_keywords', axis=1)
     return df
-	
+
 def return_embeddings_for_keywords(keywords, model):
     unique_keywords = keywords.drop_duplicates()
     embeddings = []
@@ -38,7 +47,7 @@ def add_embeddings_to_keywords(df, model):
     keywords_embeddings = return_embeddings_for_keywords(df[['topic_keyword']], model)
     return df.merge(keywords_embeddings)
 
-	
+
 def return_embeddings_for_concepts(concepts, model):
     embs = []
 
@@ -46,6 +55,6 @@ def return_embeddings_for_concepts(concepts, model):
         embs.append(return_embeddings(concept, model))
 
     return pd.DataFrame(np.concatenate(embs), columns=list(range(embs[0].shape[1])))
-	
-	
-	
+
+
+
