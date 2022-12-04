@@ -8,8 +8,9 @@ from transformers import AutoTokenizer, AutoModel
 tokenizer = AutoTokenizer.from_pretrained("dmis-lab/biobert-v1.1")
 
 
-def return_embeddings(my_sentence, model): 
+def return_embeddings(my_sentence, model, device): 
     input_ids = tokenizer(my_sentence, return_tensors="pt")
+    input_ids = {key: val.to(device) for key, val in input_ids.items()}
     try:
         model = model.bert
     except AttributeError:
@@ -48,11 +49,11 @@ def add_embeddings_to_keywords(df, model):
     return df.merge(keywords_embeddings)
 
 
-def return_embeddings_for_concepts(concepts, model):
+def return_embeddings_for_concepts(concepts, model, device):
     embs = []
 
     for concept in tqdm.tqdm(concepts.values.flatten()): 
-        embs.append(return_embeddings(concept, model))
+        embs.append(return_embeddings(concept, model, device))
 
     return pd.DataFrame(np.concatenate(embs), columns=list(range(embs[0].shape[1])))
 
