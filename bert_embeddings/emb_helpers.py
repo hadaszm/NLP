@@ -36,19 +36,19 @@ def process_extracted_keywords_file(filename):
     df = df.drop('topic_keywords', axis=1)
     return df
 
-def return_embeddings_for_keywords(keywords, model):
+def return_embeddings_for_keywords(keywords, model, device):
     unique_keywords = keywords.drop_duplicates()
     embeddings = []
     for keyword in tqdm.tqdm(unique_keywords['topic_keyword']): 
-        embeddings.append(return_embeddings(keyword, model))
+        embeddings.append(return_embeddings(keyword, model, device))
     embeddings = np.concatenate(embeddings, axis=0)
     embeddings = pd.DataFrame(embeddings, columns=list(range(embeddings.shape[1])))
     embeddings['topic_keyword'] = unique_keywords['topic_keyword'].reset_index(drop=True)
 
     return embeddings
 
-def add_embeddings_to_keywords(df, model): 
-    keywords_embeddings = return_embeddings_for_keywords(df[['topic_keyword']], model)
+def add_embeddings_to_keywords(df, model, device): 
+    keywords_embeddings = return_embeddings_for_keywords(df[['topic_keyword']], model, device)
     return df.merge(keywords_embeddings)
 
 
