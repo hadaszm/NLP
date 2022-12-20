@@ -1,6 +1,10 @@
 Steps to reproduce the results:
 
-1. Data download and preprocessing (TODO GOSIA) + BERT embeddings? (TODO: KRYSTIAN)
+1. Data download and preprocessing (TODO GOSIA)
+    1.1 UMLS 
+    Firstly ask for access https://www.nlm.nih.gov/research/umls/index.html, when granted download 2017AA and newest release. From 2017AA release copy MRSTY.RRF and MRCONSO_HISTORY.txt from newest release copy MRCONSO.RRF file. Run file concepts_from_umls/save_concepts.ipynb.
+    1.2 Embeddings
+    Run bert_embeddings/saving_embeddings_from_concepts_biobert.ipynb
 
 2. LDA (TODO: GOSIA)
 
@@ -22,9 +26,10 @@ Section 'Results analysis' is dedicated for some basic results investigation.
 Then, extract keywords-annotation matching with the use of previously generated files (section 'Extracting first order keywords-anotations matching') 
 To save final annotation result run cells in section 'Save annotated pairs'
 
-5. Embedding tager (TODO KRYSTIAN)
-
+5. Embedding tagger
+Run emb_tagger/tagging_colab.ipynb file with proper filenames as input  variable (emb_files)
 6. Disambiguation (TODO GOSIA)
 
-7. Metrics (TODO KRYSTIAN)
+7. Metrics
+Run summary/stats.ipynb file
 
