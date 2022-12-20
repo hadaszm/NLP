@@ -1,9 +1,9 @@
 Steps to reproduce the results:
 
-1. Data download and preprocessing (TODO GOSIA)\\
-    1.1 UMLS \\
-    Firstly ask for access https://www.nlm.nih.gov/research/umls/index.html, when granted download 2017AA and newest release. From 2017AA release copy MRSTY.RRF and MRCONSO_HISTORY.txt from newest release copy MRCONSO.RRF file. Run file concepts_from_umls/save_concepts.ipynb.\\
-    1.2 Embeddings\\
+1. Data download and preprocessing (TODO GOSIA)\
+    1.1 UMLS \
+    Firstly ask for access https://www.nlm.nih.gov/research/umls/index.html, when granted download 2017AA and newest release. From 2017AA release copy MRSTY.RRF and MRCONSO_HISTORY.txt from newest release copy MRCONSO.RRF file. Run file concepts_from_umls/save_concepts.ipynb.\
+    1.2 Embeddings\
     Run bert_embeddings/saving_embeddings_from_concepts_biobert.ipynb
 
 2. LDA (TODO: GOSIA)
