@@ -26,10 +26,11 @@ Section 'Results analysis' is dedicated for some basic results investigation.
 Then, extract keywords-annotation matching with the use of previously generated files (section 'Extracting first order keywords-anotations matching') 
 To save final annotation result run cells in section 'Save annotated pairs'
 
-5. Embedding tagger\\
+5. Embedding tagger\
 Run emb_tagger/tagging_colab.ipynb file with proper filenames as input  variable (emb_files)
+
 6. Disambiguation (TODO GOSIA)
 
-7. Metrics\\
+7. Metrics\
 Run summary/stats.ipynb file
 
