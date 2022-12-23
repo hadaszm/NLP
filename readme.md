@@ -5,8 +5,11 @@ Steps to reproduce the results:
     Firstly ask for access https://www.nlm.nih.gov/research/umls/index.html, when granted download 2017AA and newest release. From 2017AA release copy MRSTY.RRF and MRCONSO_HISTORY.txt from newest release copy MRCONSO.RRF file. Run file concepts_from_umls/save_concepts.ipynb.\
     1.2 Embeddings\
     Run bert_embeddings/saving_embeddings_from_concepts_biobert.ipynb
+    1.3 MedMensions \
+    Download data from https://github.com/chanzuckerberg/MedMentions/tree/master/st21pv to the folder "data", unzip data
+    1.4 Run data_analysis.ipynb
 
-2. LDA (TODO: GOSIA)
+2. LDA got to LDA folder and run LDA_analysis.ipynb
 
 3. BERTopic 
 Go to bert_topic folder and then to bert_topic.ipynb file. Choose the way you want to preprocess the data by runing cells in appropriate sections:
