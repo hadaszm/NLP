@@ -10,7 +10,7 @@ tokenizer = AutoTokenizer.from_pretrained("dmis-lab/biobert-v1.1")
 
 def return_embeddings(my_sentence, model, device): 
     input_ids = tokenizer(my_sentence, return_tensors="pt")
-    input_ids = {key: val.to(device) for key, val in input_ids.items()}
+    input_ids = {key: val.to(device)[:, :512] for key, val in input_ids.items()}
     try:
         model = model.bert
     except AttributeError:
