@@ -1,0 +1,6 @@
+,StartIndex,EndIndex,MentionTextSegment,EntityID,PMID
+GO_MF_2016_02_16_Instance_70696,462,475,annealing activity,GO:0097617,14675480
+GO_MF_2016_02_16_Instance_80836,1532,1540,"protein binding, bridging",GO:0030674,15207008
+GO_MF_2016_02_16_Instance_100329,455,468,annealing activity,GO:0097617,16109169
+GO_MF_2016_02_16_Instance_100391,689,702,annealing activity,GO:0097617,16110338
+GO_MF_2016_02_16_Instance_100393,1042,1055,annealing activity,GO:0097617,16110338
