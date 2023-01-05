@@ -1,6 +1,6 @@
 Steps to reproduce the results:
 
-1. Data download and preprocessing (TODO GOSIA)\
+1. Data download and preprocessing \
     1.1 UMLS \
     Firstly ask for access https://www.nlm.nih.gov/research/umls/index.html, when granted download 2017AA and newest release. From 2017AA release copy MRSTY.RRF and MRCONSO_HISTORY.txt from newest release copy MRCONSO.RRF file. Run file concepts_from_umls/save_concepts.ipynb.\
     1.2 Embeddings\
@@ -32,7 +32,8 @@ To save final annotation result run cells in section 'Save annotated pairs'
 5. Embedding tagger\
 Run emb_tagger/tagging_colab.ipynb file with proper filenames as input  variable (emb_files)
 
-6. Disambiguation (TODO GOSIA)
+6. Disambiguation
+Run disabmbiguation/disambiguation.ipynb
 
 7. Metrics\
 Run summary/stats.ipynb file
