@@ -6,6 +6,6 @@ Steps to reproduce the results:
 	`python script.py prepare_data=True` <br />
 	It takes long time so you can instead use:  <br />
 	`python script.py prepare_data=False` <br />
-	It fill skip initial step.  <br />
+	It will skip initial step.  <br />
 	If you want to stop the program and run it later you can use timestamp from filenames of results for example:  <br />
 	`python script.py prepare_data=False timestamp=2023-01-13_16-21-53`
