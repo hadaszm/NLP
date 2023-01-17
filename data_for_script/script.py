@@ -1,6 +1,14 @@
 import sys
 import os
 import nltk
+from gensim import corpora, models
+import os
+import pandas as pd
+import copy
+from tqdm import tqdm
+import math
+import numpy as np
+
 
 
 def get_now_str():
@@ -446,7 +454,184 @@ def calculate_embeddings_from_ncbo(files, timestamp, embeddings_output_filepath)
     embeddings.to_csv(output_path, index=False)
     return output_path
 
-def prepare_disambiguation(results_folder,data_path, tagger_path, embedings_path,timestamp, method_name, with_21 = False,weigthing=False,sorting=False):
+#-------------------------DISAMBIGUATION-------------------------------------
+
+def get_embeding(word,emb):
+    """Get word embedding """
+    return emb.loc[word]
+def create_tags_list_dict(row, with_sorting = False):
+    '''
+    Parameters
+    ----------
+    row : list
+        list of lists keyword, concept
+    with_sorting : bool
+        should sorting be enables
+        
+    Returns
+    ------
+    results : dict
+        initaly sorted (or random ordered) dictionary keyword : dict of concepts {concept : distance}
+    '''
+    result = {}
+    for tag in row:
+        key = tag[0].split(',')[0].upper()
+        value = tag[1].upper()
+        if key in result.keys():
+            if  value not in result[key]:
+                result[key][value]=1
+            else:
+                 result[key][value]+=1
+        else:
+            result[key]= {value:1}
+    if with_sorting:
+        for key in result.keys():
+            d = result[key]
+            d = {k:0 for k,v in dict(sorted(d.items(), key=lambda item: item[1], reverse = True)).items()}
+            result[key] = d
+    else:
+        for key in result.keys():
+            d = result[key]
+            d = {k:0 for k,v in d.items()}
+            result[key] = d
+        
+
+    return result
+def disambiguation(current_selection,embedings, weigths, forced):
+    ''' 
+    Parameters
+    ----------
+    current_selection : dict
+         dictionary keyword: list of all unique concepts
+    weigths: dict
+         the importance of given keyword
+    forced: bool
+        should the concept identical with keyword be the first
+
+    Returns
+    ------
+    new_current_selction : dict
+        dictionary with new best selction of concepts
+    
+    '''
+    # we iterate over the current_selection MAX_ITER times
+    new_current_selction  = copy.deepcopy(current_selection)
+    should_stop = False
+    for i in range(7):
+
+        for keyword, concepts_list in new_current_selction.items():
+            distances = {} # for each possible concept calaculate the mean distance from other kewords (concepts of them)
+            if forced and  any([c== keyword for c in concepts_list.keys()]):
+                _ = [c != keyword for c in concepts_list.keys()]
+                distances = dict(zip(_,[1000]* len(_)))
+                distances[keyword] = 0
+            else:
+                for concept in concepts_list.keys():
+                    distances[concept] = []
+                    for k, current_best_tags in new_current_selction.items():
+                        # foreach keyword that is not a current one 
+                        if k!=keyword:
+                            current_best_tag = list(current_best_tags.keys())[0] # the first out of list of concepts
+                            try:
+                                distances[concept].append(weigths[k]*math.dist(get_embeding(concept,embedings),get_embeding(current_best_tag,embedings))) # append distance from this concept
+                            except Exception as e:
+                                print(e)
+                    distances[concept] = np.mean(distances[concept]) # mean distance 
+            new_current_selction[keyword] = dict(sorted(distances.items(), key=lambda item: item[1]))  # upadate the current selection of this keyword
+    return new_current_selction
+    
+    
+def keywords_importance(grouped_data, tagger_data):
+    """get keywords importance"""
+    return grouped_data.reset_index().merge(tagger_data[['PMID','topic_keywords']] ,on = 'PMID').set_index('text_to_annotate')
+
+def get_n_best_tags(data, n = 1):
+    """how many best concepts to take"""
+    return [{k:sorted(v, key=v.get)[:n] for k,v in dd.items()} for dd in data['after_disambiguation']]
+
+def prepare_for_disambiguation(data, tagger, embedings,column_name = 'ncbo_annotations_pairs' ,  weighting = False, sorting = False, forced = False, take_best = 1):
+    """prepare data for disambiguation - read csv, eval, set index etc.
+
+    Parameters
+    ----------
+    datas : DataFrames
+        DataFrame with keywords
+    tagger : DataFrames
+        DataFrame with keywords importance
+    embedings : DataFrames
+        DataFrame with keywords embedings
+    column_name : str
+        Name of the column with annotations
+    weigthing: bool
+        Should the weigthed voting be performed
+    sorting: bool
+        Should the initial sorting be performed
+    take_best : int
+        How many best concepts should be returned
+
+
+
+    Returns
+    ------
+    data  : DataFrame
+    """
+    grouped = data.groupby('text_to_annotate').nth(0)
+    # get importance for each keyword -> will be used if weighting True
+    grouped = keywords_importance(grouped, tagger )
+    grouped['possible_tags'] = grouped[column_name].apply(lambda r: create_tags_list_dict(r, sorting))
+
+    # disambiguation
+    res = []
+    for idx, row  in tqdm.tqdm(grouped.iterrows(), total = len(grouped)):
+        current_selection = row['possible_tags']
+        if not weighting:
+            weigths = dict(zip(list(row['topic_keywords'].keys()),[1] * len(row['topic_keywords'])))
+        else:
+            weigths = row['topic_keywords']
+        r = disambiguation(current_selection, embedings,weigths,forced)
+        res.append(r)
+    grouped['after_disambiguation'] = res
+    data = data.merge(grouped['after_disambiguation'].reset_index(), on = 'text_to_annotate' )
+    data['disambiguation_best_concept'] = get_n_best_tags(data, take_best)
+    return data
+
+
+def prepare_data(data_name, tagger_name, embedings_name):
+    """prepare data for disambiguation - read csv, eval, set index etc.
+
+    Parameters
+    ----------
+    data_name : str
+        Path to get data
+    tagger_name : str
+        Path to save the results to (folder must exist).
+
+    embedings_name : str
+        Path to save the results to (folder must exist).
+
+
+    Returns
+    ------
+    data, tagger, embedings : tuple (DataFrame, DataFrame, DataFrame) 
+    """
+    import pandas as pd
+    data = pd.read_csv(data_name)
+    data['ncbo_annotations_pairs'] = data['ncbo_annotations_pairs'].apply(eval)
+    data['ncbo_annotations_pairs']  = data['ncbo_annotations_pairs'].apply(lambda x : [[a[0].upper(),a[1]] for a in x])
+
+    tagger = pd.read_csv(tagger_name)
+    tagger['topic_keywords'] = tagger['topic_keywords'].apply(eval).apply(lambda x: {k.upper():v for k,v in dict(x).items()})
+
+
+    embedings = pd.read_csv(embedings_name)
+    embedings = embedings.set_index('words')
+    embedings.index = embedings.index.str.upper()
+    embedings = embedings[~embedings.index.duplicated(keep='first')]
+
+    return  data, tagger, embedings
+
+
+def prepare_disambiguation(results_folder,data_path, tagger_path, embedings_path,timestamp,weigthing=False,sorting=False,forced = False):
     """Performs disambiguation
 
     Parameters
@@ -466,14 +651,14 @@ def prepare_disambiguation(results_folder,data_path, tagger_path, embedings_path
     timestamp : str
         Timestamp that will be added to filenames
 
-    with_21: bool
-        Is column correspnding to 21 semantic types avaiable
-
     weigthing: bool
         Should the weigthed voting be performed
 
     sorting: bool
         Should the initial sorting be performed
+
+    forced: bool
+        If true: if the any concept is identical with keyword it is returned
 
 
     Returns
@@ -481,159 +666,87 @@ def prepare_disambiguation(results_folder,data_path, tagger_path, embedings_path
     result_path : str
         Path to results
     """
-    import copy
-    import pandas as pd
-    import os 
-    import math
-    import numpy as np
 
-    def get_embeding(word,emb):
-        return emb.loc[word]
-    def create_tags_list_dict(row, with_sorting = False):
-        # dictionary keyword: list of concepts
-        # sorting enabled
-        result = {}
-        for tag in row:
-            key = tag[0].split(',')[0].upper()
-            value = tag[1].upper()
-            if key in result.keys():
-                if  value not in result[key]:
-                    result[key][value]=1
-                else:
-                    result[key][value]+=1
-            else:
-                result[key]= {value:1}
-        if with_sorting:
-            for key in result.keys():
-                d = result[key]
-                d = {k:0 for k,v in dict(sorted(d.items(), key=lambda item: item[1], reverse = True)).items()}
-                result[key] = d
-        else:
-            for key in result.keys():
-                d = result[key]
-                d = {k:0 for k,v in d.items()}
-                result[key] = d
-            
+    data, tagger, embedings = prepare_data( data_path,tagger_path,embedings_path)
+    data = prepare_for_disambiguation(data,tagger,embedings,'ncbo_annotations_pairs',weigthing,sorting,forced)
+    data.to_csv(results_folder)
 
-        return result
+    return results_folder
 
-    def disambiguation(current_selection,embedings, weigths):
-        ''' 
-        current_selection : dictionary keyword: list of all unique concepts
-        weigths: the importance of given keyword
-        
-        '''
-        # we iterate over the current_selection MAX_ITER times
-        vis = []
-        iterations = dict(zip(current_selection.keys(),[0]*len(current_selection)))
-        new_current_selction  = copy.deepcopy(current_selection)
-        should_stop = False
-        for i in range(7):
-
-            for keyword, concepts_list in new_current_selction.items():
-                if iterations[keyword]>0:
-                    break
-                distances = {} # for each possible concept calaculate the mean distance from other kewords (concepts of them)
-                for concept in concepts_list.keys():
-                    distances[concept] = []
-                    for k, current_best_tags in new_current_selction.items():
-                        # foreach keyword that is not a current one 
-                        if k!=keyword:
-                            current_best_tag = list(current_best_tags.keys())[0] # the first out of list of concepts
-                            try:
-                                distances[concept].append(weigths[k]*math.dist(get_embeding(concept,embedings),get_embeding(current_best_tag,embedings))) # append distance from this concept
-                            except Exception as e:
-                                print(e)
-                    distances[concept] = np.mean(distances[concept]) # mean distance 
-                if keyword == 'COFFEE':
-                    vis.append((i,distances))
-                if list(new_current_selction[keyword].values()) == list(dict(sorted(distances.items(), key=lambda item: item[1])).values()):
-                    iterations[keyword] = i
-                new_current_selction[keyword] = dict(sorted(distances.items(), key=lambda item: item[1]))  # upadate the current selection of this keyword
-        return new_current_selction,vis, iterations
-        
-    def keywords_importance(grouped_data, tagger_data):
-        return grouped_data.reset_index().merge(tagger_data[['PMID','topic_keywords']] ,on = 'PMID').set_index('text_to_annotate')
-
-    def get_n_best_tags(data, n = 1):
-        return [{k:sorted(v, key=v.get)[:n] for k,v in dd.items()} for dd in data['after_disambiguation']]
-    def prepare_disambiguation(data, tagger, embedings,column_name = 'ncbo_annotations_pairs' ,  weighting = False, sorting = False, take_best = 1):
-        grouped = data.groupby('text_to_annotate').nth(0)
-        # get importance for each keyword -> will be used if weighting True
-        grouped = keywords_importance(grouped, tagger )
-        grouped['possible_tags'] = grouped[column_name].apply(lambda r: create_tags_list_dict(r, sorting))
-
-        # disambiguation
-        res = []
-        vis = []
-        its = []
-        for idx, row  in grouped.iterrows():
-            current_selection = row['possible_tags']
-            if not weighting:
-                weigths = dict(zip(list(row['topic_keywords'].keys()),[1] * len(row['topic_keywords'])))
-            else:
-                weigths = row['topic_keywords']
-            r,v, it= disambiguation(current_selection, embedings,weigths)
-            res.append(r)
-            vis.append(v)
-            its.append(it)
-        grouped['after_disambiguation'] = res
-        data = data.merge(grouped['after_disambiguation'].reset_index(), on = 'text_to_annotate' )
-        data['disambiguation_best_concept'] = get_n_best_tags(data, take_best)
-        return data,vis,its
+#-------------------------LDA------------------------------------------------
 
 
-    def prepare_data(data_name, tagger_name, embedings_name,with_21 = True):
-        data = pd.read_csv(data_name)
-        data['ncbo_annotations_pairs'] = data['ncbo_annotations_pairs'].apply(eval)
-        data['ncbo_annotations_pairs']  = data['ncbo_annotations_pairs'].apply(lambda x : [[a[0].upper(),a[1]] for a in x])
-        if with_21:
-            data['ncbo_annotations_ST21pv_semtypes_pairs'] = data['ncbo_annotations_ST21pv_semtypes_pairs'].apply(eval)
-            data['ncbo_annotations_ST21pv_semtypes_pairs']  = data['ncbo_annotations_ST21pv_semtypes_pairs'].apply(lambda x : [[a[0].upper(),a[1]] for a in x])
+def get_lda_results(data_path, num_topics = 10,num_keywords = 10):
+    """Performs lda keywords extraction for data after lemmatization.
 
-        tagger = pd.read_csv(tagger_name)
-        tagger['topic_keywords'] = tagger['topic_keywords'].apply(eval).apply(lambda x: {k.upper():v for k,v in dict(x).items()})
+    Parameters
+    ----------
+    data_path : str
+        Path to preprocessed dataset. Dataset must contain a column with name 'tokenized_words_lemmatize'.
+    timestamp : str
+        Timestamp of getting data
+    num_topic : int
+        Number of disired topics
 
+    num_keywords : int
+        Number of keywords per topic
 
-        embedings = pd.read_csv(embedings_name)
-        embedings = embedings.set_index('words')
-        embedings.index = embedings.index.str.upper()
-        embedings = embedings[~embedings.index.duplicated(keep='first')]
+    Returns
+    ------
+    result, topic_distribution,lda_model : (DataFrame,DataFrame,model)
+        DataFrame with reults, DataFrae with topic distribution and lda_model
 
-        return  data, tagger, embedings
+    """
 
-    def prepare_data(data_name, tagger_name, embedings_name,with_21 = True):
-        data = pd.read_csv(data_name)
-        data['ncbo_annotations_pairs'] = data['ncbo_annotations_pairs'].apply(eval)
-        data['ncbo_annotations_pairs']  = data['ncbo_annotations_pairs'].apply(lambda x : [[a[0].upper(),a[1]] for a in x])
-        if with_21:
-            data['ncbo_annotations_ST21pv_semtypes_pairs'] = data['ncbo_annotations_ST21pv_semtypes_pairs'].apply(eval)
-            data['ncbo_annotations_ST21pv_semtypes_pairs']  = data['ncbo_annotations_ST21pv_semtypes_pairs'].apply(lambda x : [[a[0].upper(),a[1]] for a in x])
-
-        tagger = pd.read_csv(tagger_name)
-        tagger['topic_keywords'] = tagger['topic_keywords'].apply(eval).apply(lambda x: {k.upper():v for k,v in dict(x).items()})
+    def get_topic_distribution(lda_model, number_of_topics, number_of_keywords):
+        topics_distrib = {}
+        for t in lda_model.print_topics(number_of_topics,number_of_keywords):
+            topics_distrib[t[0]] =[(a.split('*')[1][1:-1],float(a.split("*")[0])) for a in t[1].split(' + ')]
+        return topics_distrib
 
 
-        embedings = pd.read_csv(embedings_name)
-        embedings = embedings.set_index('words')
-        embedings.index = embedings.index.str.upper()
-        embedings = embedings[~embedings.index.duplicated(keep='first')]
+    data = pd.read_csv(data_path)
+    columns = ['tokenized_sentences', 'tokenized_words_lemmatize']
+    for col in columns:
+        data[col] = data[col].apply(eval)
 
-        return  data, tagger, embedings
+    texts = data.groupby('PMID')['tokenized_words_lemmatize'].agg(lambda x: x.iloc[0]+x.iloc[1])
+    dictionary = corpora.Dictionary(texts)
+    corpus = [dictionary.doc2bow(text) for text in texts]
+
+    
+    lda_model = models.LdaMulticore(corpus=corpus,
+                                        id2word=dictionary,
+                                        num_topics=num_topics,
+                                        passes = 20)
+    doc_lda = lda_model[corpus]
+
+    topic_distribution = get_topic_distribution(lda_model,num_topics,num_keywords)
+    topics_results = pd.DataFrame.from_records([topic_distribution]).T.reset_index().rename(columns = {'index':'topic_number',0:'topic_keywords'})
+    topics_results['keywords'] = topics_results['topic_keywords'].apply(lambda x: [a[0] for a in x])
+
+    
+
+    docs= []
+    for doc in doc_lda:
+        docs.append({
+            'topic_number':doc[0][0],
+            'topic_probs': float(doc[0][1]),
+            'topic_keywords': topics_results.iloc[doc[0][0]]['topic_keywords'],
+            'keywords': topics_results.iloc[doc[0][0]]['keywords']
+
+        })
+
+    docs = pd.DataFrame.from_records(docs)
+
+    results = data[['PMID']].drop_duplicates().reset_index(drop=True).join(docs)
+    topics_results = pd.DataFrame.from_records([topic_distribution]).T.reset_index().rename(columns = {'index':'topic_number',0:'topic_keywords'})
 
 
-    data, tagger, embedings = prepare_data(data_path, tagger_path, embedings_path,with_21)
 
-    data_res, vis, its = prepare_disambiguation(data,tagger,embedings,'ncbo_annotations_pairs' )
-    results_path = os.path.join(results_folder,f'disambiguation_res_{method_name}_{timestamp}.csv')
-    data_res.to_csv(results_path)
+    return results,topics_results, lda_model
 
-    return results_path
-
-def get_keywords_lda(data_path, models_path, results_path, timestamp, num_topics = 10):
-    from gensim import corpora, models
-    import os
-    import pandas as pd
+def get_keywords_lda(data_path, models_path, results_path, timestamp, num_topics = 10,num_keywords = 10):
     """Performs lda keywords extraction for data after lemmatization.
 
     Parameters
@@ -659,52 +772,17 @@ def get_keywords_lda(data_path, models_path, results_path, timestamp, num_topics
         Frist element is the path to created file with extracted keywrods, second - path to created model.
     """
 
-    def get_topic_distribution(lda_model):
-        topics_distrib = {}
-        for t in lda_model.show_topics(21):
-            topics_distrib[t[0]] =[(a.split('*')[1][1:-1],float(a.split("*")[0])) for a in t[1].split(' + ')]
-        return topics_distrib
+    results,topics_results, lda_model =  get_lda_results(data_path, num_topics ,num_keywords)
 
-
-    train_data = pd.read_csv(data_path)
-    columns = ['tokenized_sentences', 'tokenized_words_lemmatize']
-    for col in columns:
-        train_data[col] = train_data[col].apply(eval)
-
-    texts = train_data.groupby('PMID')['tokenized_words_lemmatize'].agg(lambda x: x.iloc[0]+x.iloc[1])
-    dictionary = corpora.Dictionary(texts)
-    corpus = [dictionary.doc2bow(text) for text in texts]
-
-    
-    lda_model = models.LdaMulticore(corpus=corpus,
-                                        id2word=dictionary,
-                                        num_topics=num_topics,
-                                        passes = 20)
-    doc_lda = lda_model[corpus]
-
-    topic_distribution = get_topic_distribution(lda_model)
-    topics_results = pd.DataFrame.from_records([topic_distribution]).T.reset_index().rename(columns = {'index':'topic_number',0:'topic_keywords'})
-    topics_results.to_csv(os.path.join(results_path, f'topic_distribution_LDA_{timestamp}.csv'))
-    
-
-    docs_train= []
-    for doc in doc_lda:
-        docs_train.append({
-            'topic_number':doc[0][0],
-            'topic_probs': float(doc[0][1]),
-            'topic_keywords': topics_results.iloc[doc[0][0]]['topic_keywords']
-
-        })
-    docs_train = pd.DataFrame.from_records(docs_train)
-
-    train_results = train_data[['PMID']].drop_duplicates().reset_index(drop=True).join(docs_train)
-    results_path = os.path.join(os.path.join(results_path, 'lda',  f'LDA_{timestamp}.csv'))
-    train_results.to_csv(results_path)
+    results_path = os.path.join(os.path.join(results_path, f'lda_results_{timestamp}.csv'))
+    results.to_csv(results_path)
 
     models_path = os.path.join(models_path,f"lda_model_{timestamp}")
     lda_model.save(models_path)
+
     return results_path,models_path
     
+#-----------------------DATA PREPERATION-------------------------------
 def prepare_data(data_folder,results_folder,option):
     """Performs bertopic keywords extraction for data after lemmatization.
 
