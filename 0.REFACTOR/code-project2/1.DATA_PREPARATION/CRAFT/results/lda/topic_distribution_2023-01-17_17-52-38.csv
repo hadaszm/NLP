@@ -1,0 +1,11 @@
+,topic_number,topic_keywords
+0,0,"[('gene', 0.018), ('mouse', 0.013), ('development', 0.012), ('protein', 0.01), ('locus', 0.008), ('expression', 0.008), ('trait', 0.008), ('phenotype', 0.008), ('analysis', 0.008), ('identified', 0.008)]"
+1,1,"[('cell', 0.023), ('mouse', 0.015), ('mutant', 0.008), ('development', 0.008), ('crest', 0.008), ('neural', 0.008), ('heterochromatin', 0.008), ('hair', 0.007), ('taste', 0.007), ('protein', 0.006)]"
+2,2,"[('cell', 0.018), ('protein', 0.013), ('A7', 0.01), ('sex', 0.009), ('annexin', 0.008), ('process', 0.008), ('role', 0.007), ('chromatin', 0.007), ('domain', 0.007), ('development', 0.007)]"
+3,3,"[('gene', 0.03), ('mouse', 0.029), ('expression', 0.011), ('individual', 0.009), ('cell', 0.009), ('repair', 0.009), ('system', 0.008), ('DNA', 0.008), ('bone', 0.008), ('transcription', 0.007)]"
+4,4,"[('mouse', 0.016), ('cell', 0.015), ('apoptotic', 0.01), ('Ptdsr', 0.009), ('response', 0.009), ('Pten', 0.009), ('channel', 0.008), ('chromosome', 0.008), ('strain', 0.008), ('time', 0.008)]"
+5,5,"[('mouse', 0.0), ('γ2', 0.0), ('CLN2', 0.0), ('enzyme', 0.0), ('model', 0.0), ('gene', 0.0), ('behavior', 0.0), ('highly', 0.0), ('cell', 0.0), ('important', 0.0)]"
+6,6,"[('mouse', 0.03), ('receptor', 0.016), ('gene', 0.014), ('cell', 0.014), ('olfactory', 0.011), ('expression', 0.007), ('RanBP2', 0.007), ('γ2', 0.007), ('protein', 0.006), ('Abstract', 0.006)]"
+7,7,"[('model', 0.014), ('mouse', 0.013), ('neuron', 0.011), ('expression', 0.01), ('gene', 0.01), ('neuronal', 0.009), ('SOX1', 0.009), ('VS', 0.009), ('MSUD', 0.009), ('joint', 0.009)]"
+8,8,"[('gene', 0.019), ('protein', 0.017), ('mouse', 0.015), ('cell', 0.011), ('human', 0.008), ('expression', 0.008), ('function', 0.007), ('muscle', 0.007), ('factor', 0.007), ('Abstract', 0.006)]"
+9,9,"[('cell', 0.017), ('mouse', 0.017), ('expression', 0.01), ('development', 0.008), ('protein', 0.006), ('A7', 0.006), ('Annexin', 0.006), ('early', 0.006), ('Abstract', 0.006), ('gene', 0.005)]"

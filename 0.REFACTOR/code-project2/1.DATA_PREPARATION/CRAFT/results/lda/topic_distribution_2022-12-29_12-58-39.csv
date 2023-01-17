@@ -1,0 +1,11 @@
+,topic_number,topic_keywords
+0,0,"[('cell', 0.015), ('individual', 0.011), ('factor', 0.011), ('gene', 0.011), ('transcription', 0.01), ('expression', 0.009), ('muscle', 0.008), ('differentiation', 0.008), ('slow', 0.008), ('antioxidant', 0.007)]"
+1,1,"[('mouse', 0.016), ('gene', 0.011), ('cell', 0.01), ('protein', 0.01), ('expression', 0.009), ('development', 0.007), ('Abstract', 0.007), ('phenotype', 0.006), ('analysis', 0.005), ('embryo', 0.005)]"
+2,2,"[('mouse', 0.015), ('gene', 0.014), ('mutant', 0.012), ('locus', 0.01), ('cell', 0.009), ('arthritis', 0.007), ('kidney', 0.007), ('Abstract', 0.006), ('development', 0.006), ('expression', 0.006)]"
+3,3,"[('amyloid', 0.019), ('Aβ', 0.017), ('APP', 0.01), ('pathology', 0.01), ('transgenic', 0.008), ('production', 0.008), ('mouse', 0.008), ('deposit', 0.006), ('Alzheimer', 0.006), ('model', 0.006)]"
+4,4,"[('mouse', 0.02), ('expression', 0.02), ('gene', 0.019), ('Pten', 0.007), ('Tbx15', 0.007), ('system', 0.007), ('sterol', 0.006), ('demonstrate', 0.006), ('mutation', 0.006), ('dorsoventral', 0.006)]"
+5,5,"[('mouse', 0.027), ('cell', 0.024), ('gene', 0.015), ('receptor', 0.013), ('protein', 0.01), ('olfactory', 0.008), ('A7', 0.007), ('expression', 0.007), ('role', 0.006), ('level', 0.006)]"
+6,6,"[('mouse', 0.018), ('CF', 0.015), ('intestinal', 0.012), ('phenotype', 0.011), ('memory', 0.008), ('modifier', 0.008), ('background', 0.008), ('expression', 0.007), ('olfactory', 0.007), ('marker', 0.007)]"
+7,7,"[('cell', 0.015), ('mouse', 0.011), ('heterochromatin', 0.01), ('microtubule', 0.01), ('bone', 0.01), ('Mid1', 0.009), ('embryonic', 0.009), ('channel', 0.008), ('embryo', 0.008), ('secretion', 0.006)]"
+8,8,"[('mouse', 0.033), ('γ2', 0.021), ('gene', 0.009), ('behavior', 0.009), ('ADAM11', 0.008), ('cell', 0.007), ('subunit', 0.007), ('benzodiazepine', 0.007), ('reduced', 0.007), ('normal', 0.007)]"
+9,9,"[('protein', 0.016), ('gene', 0.015), ('mouse', 0.014), ('function', 0.012), ('cell', 0.01), ('RanBP2', 0.008), ('model', 0.007), ('role', 0.007), ('development', 0.007), ('acid', 0.006)]"
