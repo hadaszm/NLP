@@ -1,4 +1,4 @@
-0.RESULTS - folder with results from each step
+* 0.RESULTS - folder with results from each step
     * bertopic
     * bertopic_ncbo
     * disambiguation
@@ -12,7 +12,7 @@
             * annotations.csv - annoations present in CRAFT dataset from this ontology 
         * data_whole.csv - preprocessed CRAFT data (lemmatization, tokenization etc.)
 
-1.DATA_PREPARATION 
+* 1.DATA_PREPARATION 
     * concepts_from_umls
         * save_concepts.ipynb
     * CRAFT
@@ -22,12 +22,12 @@
     * ontologies
         * ontologies_mapping_preparation.ipynb - file contaiing the processing of ontologies .owl files to the form of concept_id:concpet_name, results saved in 0.RESULTS/preprocessing/-ontologies_mapping
 
-2.KEYWORDS_EXTRACTION
+* 2.KEYWORDS_EXTRACTION
     * bert_topic
         * bert_topic.ipynb - file containing implementation for BERTopic keywords extraction
     * LDA
         * LDA_analysis.ipynb - keyword extraction using LDA
-3.TAGGING
+* 3.TAGGING
     * bert_embeddings
         * emb_helpers.py
         * saving_embeddings_from_concepts_biobert_craft.ipynb
@@ -39,8 +39,8 @@
         * tagging_craft.ipynb
     * ncbo tagger
         * ncbo_tagger.ipynb - file containing NCBO tagging proccess (based either on bertopic keywords or NCBO keywords)
-4.DISAMBIGUATION
+* 4.DISAMBIGUATION
     * disambiguation.ipynb - di
-5.EVALUATION
+* 5.EVALUATION
     * stats.ipynb
     * stats_craft.ipynb
