@@ -13,8 +13,6 @@
         * data_whole.csv - preprocessed CRAFT data (lemmatization, tokenization etc.)
 
 * 1.DATA_PREPARATION 
-    * concepts_from_umls
-        * save_concepts.ipynb
     * CRAFT
         * articles - folder with CRAFT articles (txt without annotations) - part of CRAFT dataset
         * concept-annotation - folder contains folders with the ontologies names. In each folder there are annotations with given ontlogy - part of CRAFT dataset
@@ -30,18 +28,15 @@
         * LDA_analysis.ipynb - keyword extraction using LDA
 * 3.TAGGING
     * bert_embeddings
-        * emb_helpers.py
-        * saving_embeddings_from_concepts_biobert_craft.ipynb
-        * saving_embeddings_from_keywords_biobert_craft.ipynb
-        * saving_embeddings_from_ncbo_biobert_craft.ipynb
+        * emb_helpers.py - file with functions that are used in notebooks in this folder, they are used to calculate embedding 
+        * saving_embeddings_from_concepts_biobert_craft.ipynb - calcuilate embeddings from concepts' names from ontologies (very long)
+        * saving_embeddings_from_keywords_biobert_craft.ipynb - calcuilate embeddings from keywords from LDA and BERTopic
+        * saving_embeddings_from_ncbo_biobert_craft.ipynb - calcuilate embeddings from tags from NCBO
     * emb_tagger
-        * tagging.ipynb
-        * tagging_colab.ipynb
-        * tagging_craft.ipynb
+        * tagging_craft.ipynb - taggs keywords from LDA and BERTopic with concepts from ontologies 
     * ncbo tagger
         * ncbo_tagger.ipynb - file containing NCBO tagging proccess (based either on bertopic keywords or NCBO keywords)
 * 4.DISAMBIGUATION
     * disambiguation.ipynb - script for performing disambiguation
 * 5.EVALUATION
-    * stats.ipynb
-    * stats_craft.ipynb
+    * stats_craft.ipynb - calculates F1 score, recall and precision from e2e solution
