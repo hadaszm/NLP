@@ -29,9 +29,9 @@
 * 3.TAGGING
     * bert_embeddings
         * emb_helpers.py - file with functions that are used in notebooks in this folder, they are used to calculate embedding 
-        * saving_embeddings_from_concepts_biobert_craft.ipynb - calcuilate embeddings from concepts' names from ontologies (very long)
-        * saving_embeddings_from_keywords_biobert_craft.ipynb - calcuilate embeddings from keywords from LDA and BERTopic
-        * saving_embeddings_from_ncbo_biobert_craft.ipynb - calcuilate embeddings from tags from NCBO
+        * saving_embeddings_from_concepts_biobert_craft.ipynb - calculate embeddings from concepts' names from ontologies (very long)
+        * saving_embeddings_from_keywords_biobert_craft.ipynb - calculate embeddings from keywords from LDA and BERTopic
+        * saving_embeddings_from_ncbo_biobert_craft.ipynb - calculate embeddings from tags from NCBO
     * emb_tagger
         * tagging_craft.ipynb - taggs keywords from LDA and BERTopic with concepts from ontologies 
     * ncbo tagger
