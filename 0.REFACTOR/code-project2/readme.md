@@ -12,7 +12,7 @@
             * annotations.csv - annoations present in CRAFT dataset from this ontology 
         * data_whole.csv - preprocessed CRAFT data (lemmatization, tokenization etc.)
     
-    ATTENTION: this folder was to big for github, hence it is on the drive - link https://drive.google.com/drive/folders/1eeKlWWfk3WOvIMi3mc2QTX3d9LUaCriY
+    ATTENTION: this folder (0.RESULTS) was to big for github, hence it is on the drive - link https://drive.google.com/drive/folders/1eeKlWWfk3WOvIMi3mc2QTX3d9LUaCriY
 
 * 1.DATA_PREPARATION 
     * CRAFT
