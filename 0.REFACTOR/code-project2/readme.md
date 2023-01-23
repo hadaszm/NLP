@@ -41,3 +41,6 @@
     * disambiguation.ipynb - script for performing disambiguation
 * 5.EVALUATION
     * stats_craft.ipynb - calculates F1 score, recall and precision from e2e solution
+
+changes_for_poc2.md - what did we implement up to the poc2.
+changes_for_final_presentation.md - what did we implement from poc2 until the final project version.
