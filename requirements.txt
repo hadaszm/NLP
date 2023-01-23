@@ -16,6 +16,9 @@ entrypoints==0.4
 executing==1.1.1
 filelock==3.8.0
 fonttools==4.38.0
+fst-pso==1.8.1
+FuzzyTM==2.0.5
+gensim==4.3.0
 hdbscan==0.8.28
 huggingface-hub==0.10.1
 idna==3.4
@@ -32,6 +35,7 @@ llvmlite==0.39.1
 matplotlib==3.5.0
 matplotlib-inline==0.1.6
 mccabe==0.6.0
+miniful==0.0.6
 nest-asyncio==1.5.6
 nltk==3.7
 numba==0.56.3
@@ -47,6 +51,7 @@ plotly==5.10.0
 prompt-toolkit==3.0.31
 psutil==5.9.0
 pure-eval==0.2.2
+pyFUME==0.2.25
 Pygments==2.13.0
 pylint==2.6.0
 pynndescent==0.5.7
@@ -65,7 +70,9 @@ sentence-transformers==2.2.2
 sentencepiece==0.1.97
 setuptools==63.4.1
 setuptools-scm==7.0.5
+simpful==2.9.0
 six==1.16.0
+smart-open==6.3.0
 stack-data==0.5.1
 tenacity==8.1.0
 threadpoolctl==3.1.0
