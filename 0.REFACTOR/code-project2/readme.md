@@ -45,3 +45,13 @@
 
 changes_for_poc2.md - what did we implement up to the poc2.
 changes_for_final_presentation.md - what did we implement from poc2 until the final project version.
+<hr style="border:2px solid gray">
+Steps to reproduce the results:
+
+1. Download `reproduce_script.rar` from https://drive.google.com/drive/folders/1-lAjO3VyEMt0KWbpxhLRIx_L7h_SIuaZ?usp=sharing
+2. `cd reproduce_script`
+3. Run script with: 
+	`python script.py` <br />
+	If you want to stop the program and run it later you can use timestamp from filenames of results for example:  <br />
+	`python script.py timestamp=2023-01-24_16-21-53`
+4. results will appear in 0.RESULTS folder 
